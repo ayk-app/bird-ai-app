@@ -45,7 +45,8 @@ st.set_page_config(page_title="北海道の野鳥AI", page_icon="🦉", layout="
 
 st.markdown("""
     <style>
-    .stApp { background-color: #F4F9F4; }
+    .stApp { background-color: #F4F9F4; color: #2C2C2C; }
+    .stApp p, .stApp div, .stApp span, .stApp label { color: #2C2C2C !important; }
     h1, h2, h3, h4 { color: #4A3525 !important; font-family: 'Helvetica Neue', Arial, sans-serif; }
     [data-testid="stSidebar"] { background-color: #2A402B; }
     [data-testid="stSidebar"] * { color: #E8F0E8 !important; }
@@ -54,7 +55,7 @@ st.markdown("""
     .env-tag {
         display: inline-block;
         background-color: #6E533C;
-        color: #F4F9F4;
+        color: #F4F9F4 !important;
         padding: 5px 15px;
         border-radius: 20px;
         font-weight: bold;
