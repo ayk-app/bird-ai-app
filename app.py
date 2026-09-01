@@ -240,10 +240,13 @@ if uploaded_file is not None:
                 audio_bytes = io.BytesIO(uploaded_file.getbuffer())
                 y, sr = librosa.load(audio_bytes, sr=48000)
             else:
-                ffmpeg_path = os.path.join(BASE_DIR, "tools", "ffmpeg.exe")
-                if not os.path.exists(ffmpeg_path):
-                    ffmpeg_path = os.path.join(BASE_DIR, "ffmpeg.exe")
-                    
+           　　　　　　　if shutil.which("ffmpeg"):
+               　　　　　　　 ffmpeg_path = "ffmpeg"
+           　　　　 else:
+                　　　　　　　ffmpeg_path = os.path.join(BASE_DIR, "tools", "ffmpeg.exe")
+               　　　　　　　 if not os.path.exists(ffmpeg_path):
+                    　　　　　　　ffmpeg_path = os.path.join(BASE_DIR, "ffmpeg.exe")
+            
                 with tempfile.NamedTemporaryFile(delete=False, suffix=f".{ext}") as tmp_in:
                     tmp_in.write(uploaded_file.getbuffer())
                     tmp_in_path = tmp_in.name
