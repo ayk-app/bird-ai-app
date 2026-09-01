@@ -45,11 +45,18 @@ st.set_page_config(page_title="北海道の野鳥AI", page_icon="🦉", layout="
 
 st.markdown("""
     <style>
-    .stApp { background-color: #F4F9F4; color: #2C2C2C; }
-    .stApp p, .stApp div, .stApp span, .stApp label { color: #2C2C2C !important; }
-    h1, h2, h3, h4 { color: #4A3525 !important; font-family: 'Helvetica Neue', Arial, sans-serif; }
-    [data-testid="stSidebar"] { background-color: #2A402B; }
-    [data-testid="stSidebar"] * { color: #E8F0E8 !important; }
+    /* メイン画面（右側）のスタイル */
+    .stApp { background-color: #F4F9F4; }
+    [data-testid="stMain"] p, [data-testid="stMain"] div, [data-testid="stMain"] span, [data-testid="stMain"] label { color: #2C2C2C !important; }
+    [data-testid="stMain"] h1, [data-testid="stMain"] h2, [data-testid="stMain"] h3, [data-testid="stMain"] h4 { color: #4A3525 !important; font-family: 'Helvetica Neue', Arial, sans-serif; }
+    
+    /* サイドバー（左側）のスタイル（文字を白に固定） */
+    [data-testid="stSidebar"] { background-color: #2A402B !important; }
+    [data-testid="stSidebar"] * { color: #FFFFFF !important; }
+    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3, [data-testid="stSidebar"] h4, 
+    [data-testid="stSidebar"] p, [data-testid="stSidebar"] span, [data-testid="stSidebar"] label { color: #FFFFFF !important; }
+    
+    /* その他パーツの設定 */
     [data-testid="stTable"] { border: 2px solid #6E533C; border-radius: 10px; background-color: #FFFFFF; }
     hr { border-bottom: 2px dashed #8F7256 !important; }
     .env-tag {
