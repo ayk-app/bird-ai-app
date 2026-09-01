@@ -233,29 +233,29 @@ uploaded_file = st.file_uploader("📂 音声・動画ファイルを選択し�
 if uploaded_file is not None:
     st.audio(uploaded_file)
     
-    with st.spinner("🌿 データを解読・ノイズ処理中..."):
-        try:
-            ext = uploaded_file.name.split('.')[-1].lower()
-if ext in ['wav']:
-            audio_bytes = io.BytesIO(uploaded_file.getbuffer())
-            y, sr = librosa.load(audio_bytes, sr=48000)
-        else:
-            if shutil.which("ffmpeg"):
-                ffmpeg_path = "ffmpeg"
-            else:
-                ffmpeg_path = os.path.join(BASE_DIR, "tools", "ffmpeg.exe")
-                if not os.path.exists(ffmpeg_path):
-                    ffmpeg_path = os.path.join(BASE_DIR, "ffmpeg.exe")
-            
-                with tempfile.NamedTemporaryFile(delete=False, suffix=f".{ext}") as tmp_in:
-                    tmp_in.write(uploaded_file.getbuffer())
-                    tmp_in_path = tmp_in.name
-                tmp_out_path = tmp_in_path + ".wav"
-                subprocess.run([ffmpeg_path, "-y", "-i", tmp_in_path, "-ar", "48000", tmp_out_path], 
-                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                y, sr = librosa.load(tmp_out_path, sr=48000)
-                os.remove(tmp_in_path)
-                os.remove(tmp_out_path)
+with st.spinner("データを解読・ノイズ処理中..."):
+            try:
+                ext = uploaded_file.name.split('.')[-1].lower()
+                if ext in ['wav']:
+                    audio_bytes = io.BytesIO(uploaded_file.getbuffer())
+                    y, sr = librosa.load(audio_bytes, sr=48000)
+                else:
+                    if shutil.which("ffmpeg"):
+                        ffmpeg_path = "ffmpeg"
+                    else:
+                        ffmpeg_path = os.path.join(BASE_DIR, "tools", "ffmpeg.exe")
+                        if not os.path.exists(ffmpeg_path):
+                            ffmpeg_path = os.path.join(BASE_DIR, "ffmpeg.exe")
+
+                        with tempfile.NamedTemporaryFile(delete=False, suffix=f".{ext}") as tmp_in:
+                            tmp_in.write(uploaded_file.getbuffer())
+                            tmp_in_path = tmp_in.name
+                        tmp_out_path = tmp_in_path + ".wav"
+                        subprocess.run([ffmpeg_path, "-y", "-i", tmp_in_path, "-ar", "48000", tmp_out_path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                        y, sr = librosa.load(tmp_out_path, sr=48000)
+            except Exception as e:
+                st.error(f"読み込みエラー: {e}")
+                st.stop()
 
             if use_noise_reduction:
                 nyq = 0.5 * sr
