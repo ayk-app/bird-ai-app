@@ -2,6 +2,17 @@ import os
 import sys
 import subprocess
 import tempfile
+import shutil
+import urllib.request
+import io
+import scipy.signal as signal
+import pandas as pd
+import scipy.io.wavfile as wavf
+import matplotlib.pyplot as plt
+import numpy as np
+import librosa
+import librosa.display
+import streamlit as st
 
 # 他人のPCでも目の前のパーツを強制認識させるセーフティネット
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -10,10 +21,6 @@ os.chdir(BASE_DIR)
 SITE_PACKAGES = os.path.join(BASE_DIR, "my_env", "Lib", "site-packages")
 if os.path.exists(SITE_PACKAGES):
     sys.path.insert(0, SITE_PACKAGES)
-import streamlit as st
-import os
-import shutil
-import urllib.request
 
 # --- AIモデル & 辞書ファイル自動セットアップ ---
 MODEL_DIR = "model"
@@ -33,6 +40,7 @@ if not os.path.exists(MODEL_PATH) or os.path.getsize(MODEL_PATH) < 1000000:
     with urllib.request.urlopen(req) as response, open(MODEL_PATH, 'wb') as out_file:
         shutil.copyfileobj(response, out_file)
 # ----------------------------------------------
+
 st.set_page_config(page_title="北海道の野鳥AI", page_icon="🦉", layout="wide")
 
 st.markdown("""
@@ -54,15 +62,6 @@ st.markdown("""
     }
     </style>
     """, unsafe_allow_html=True)
-
-import librosa
-import librosa.display
-import matplotlib.pyplot as plt
-import numpy as np
-import io
-import scipy.signal as signal
-import pandas as pd
-import scipy.io.wavfile as wavf
 
 try:
     import tflite_runtime.interpreter as tflite
@@ -233,29 +232,26 @@ uploaded_file = st.file_uploader("📂 音声・動画ファイルを選択し�
 if uploaded_file is not None:
     st.audio(uploaded_file)
     
-with st.spinner("データを解読・ノイズ処理中..."):
-            try:
-                ext = uploaded_file.name.split('.')[-1].lower()
-                if ext in ['wav']:
-                    audio_bytes = io.BytesIO(uploaded_file.getbuffer())
-                    y, sr = librosa.load(audio_bytes, sr=48000)
+    with st.spinner("データを解読・ノイズ処理中..."):
+        try:
+            ext = uploaded_file.name.split('.')[-1].lower()
+            if ext in ['wav']:
+                audio_bytes = io.BytesIO(uploaded_file.getbuffer())
+                y, sr = librosa.load(audio_bytes, sr=48000)
+            else:
+                if shutil.which("ffmpeg"):
+                    ffmpeg_path = "ffmpeg"
                 else:
-                    if shutil.which("ffmpeg"):
-                        ffmpeg_path = "ffmpeg"
-                    else:
-                        ffmpeg_path = os.path.join(BASE_DIR, "tools", "ffmpeg.exe")
-                        if not os.path.exists(ffmpeg_path):
-                            ffmpeg_path = os.path.join(BASE_DIR, "ffmpeg.exe")
+                    ffmpeg_path = os.path.join(BASE_DIR, "tools", "ffmpeg.exe")
+                    if not os.path.exists(ffmpeg_path):
+                        ffmpeg_path = os.path.join(BASE_DIR, "ffmpeg.exe")
 
-                        with tempfile.NamedTemporaryFile(delete=False, suffix=f".{ext}") as tmp_in:
-                            tmp_in.write(uploaded_file.getbuffer())
-                            tmp_in_path = tmp_in.name
-                        tmp_out_path = tmp_in_path + ".wav"
-                        subprocess.run([ffmpeg_path, "-y", "-i", tmp_in_path, "-ar", "48000", tmp_out_path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                        y, sr = librosa.load(tmp_out_path, sr=48000)
-            except Exception as e:
-                st.error(f"読み込みエラー: {e}")
-                st.stop()
+                with tempfile.NamedTemporaryFile(delete=False, suffix=f".{ext}") as tmp_in:
+                    tmp_in.write(uploaded_file.getbuffer())
+                    tmp_in_path = tmp_in.name
+                tmp_out_path = tmp_in_path + ".wav"
+                subprocess.run([ffmpeg_path, "-y", "-i", tmp_in_path, "-ar", "48000", tmp_out_path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                y, sr = librosa.load(tmp_out_path, sr=48000)
 
             if use_noise_reduction:
                 nyq = 0.5 * sr
