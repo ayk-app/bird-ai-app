@@ -11,19 +11,28 @@ SITE_PACKAGES = os.path.join(BASE_DIR, "my_env", "Lib", "site-packages")
 if os.path.exists(SITE_PACKAGES):
     sys.path.insert(0, SITE_PACKAGES)
 
-import streamlit as st
 import os
+import shutil
 import urllib.request
 
-# --- AIモデル自動ダウンロード機能 ---
+# --- AIモデル & 辞書ファイル自動セットアップ ---
 MODEL_DIR = "model"
+os.makedirs(MODEL_DIR, exist_ok=True)
+
+# 1. ルートにある辞書(ja.txt)を model フォルダへ自動複製
+for file_name in ["ja.txt", "labels.txt"]:
+    if os.path.exists(file_name):
+        shutil.copy(file_name, f"{MODEL_DIR}/{file_name}")
+
+# 2. AIモデル(tflite)の自動ダウンロード
 MODEL_PATH = f"{MODEL_DIR}/audio-model.tflite"
 MODEL_URL = "https://github.com/ayk-app/bird-ai-app/releases/download/v1.0/audio-model.tflite"
 
-os.makedirs(MODEL_DIR, exist_ok=True)
-if not os.path.exists(MODEL_PATH):
-    urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
-# ------------------------------------
+if not os.path.exists(MODEL_PATH) or os.path.getsize(MODEL_PATH) < 1000000:
+    req = urllib.request.Request(MODEL_URL, headers={'User-Agent': 'Mozilla/5.0'})
+    with urllib.request.urlopen(req) as response, open(MODEL_PATH, 'wb') as out_file:
+        shutil.copyfileobj(response, out_file)
+# ----------------------------------------------
 st.set_page_config(page_title="北海道の野鳥AI", page_icon="🦉", layout="wide")
 
 st.markdown("""
