@@ -12,7 +12,18 @@ if os.path.exists(SITE_PACKAGES):
     sys.path.insert(0, SITE_PACKAGES)
 
 import streamlit as st
+import os
+import urllib.request
 
+# --- AIモデル自動ダウンロード機能 ---
+MODEL_DIR = "model"
+MODEL_PATH = f"{MODEL_DIR}/audio-model.tflite"
+MODEL_URL = "https://github.com/ayk-app/bird-ai-app/releases/download/v1.0/audio-model.tflite"
+
+os.makedirs(MODEL_DIR, exist_ok=True)
+if not os.path.exists(MODEL_PATH):
+    urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
+# ------------------------------------
 st.set_page_config(page_title="北海道の野鳥AI", page_icon="🦉", layout="wide")
 
 st.markdown("""
