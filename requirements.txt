@@ -1,5 +1,5 @@
 streamlit
-librosa
-matplotlib
 numpy
-tensorflow
+librosa
+soundfile
+tflite-runtime
