@@ -10,7 +10,7 @@ os.chdir(BASE_DIR)
 SITE_PACKAGES = os.path.join(BASE_DIR, "my_env", "Lib", "site-packages")
 if os.path.exists(SITE_PACKAGES):
     sys.path.insert(0, SITE_PACKAGES)
-
+import streamlit as st
 import os
 import shutil
 import urllib.request
