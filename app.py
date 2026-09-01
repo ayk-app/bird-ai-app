@@ -238,7 +238,11 @@ def format_time(seconds_float):
 uploaded_file = st.file_uploader("📂 音声・動画ファイルを選択してください (最大500MB)", type=["wav", "mp3", "m4a", "mp4", "mov"])
 
 if uploaded_file is not None:
-    st.audio(uploaded_file)
+    ext = uploaded_file.name.split('.')[-1].lower()
+    if ext in ['mp4', 'mov']:
+        st.video(uploaded_file)
+    else:
+        st.audio(uploaded_file)
     
     with st.spinner("データを解読・ノイズ処理中..."):
         try:
