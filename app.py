@@ -444,7 +444,7 @@ if uploaded_file is not None:
 
             # 4. タイムライン
             with st.expander("⏱️ 野鳥の出現タイムライン", expanded=False):
-                st.dataframe(timeline_data, use_container_width=True, height=500)
+                st.table(timeline_data)
             
         except Exception as e:
             st.error(f"⚠️ 計算エラー: {e}")
