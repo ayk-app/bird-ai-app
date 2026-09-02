@@ -187,8 +187,10 @@ match_threshold = st.sidebar.slider("オリジナル見本との一致度 (％)"
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("🔇 ノイズ除去設定")
-use_noise_reduction = st.sidebar.checkbox("低音ノイズを除去する (風・車など)", value=True)
-cutoff_freq = st.sidebar.slider("カットする周波数 (Hz)", min_value=100, max_value=2000, value=500, step=50)
+form = st.sidebar.form("noise_form")
+use_noise_reduction = form.checkbox("低音ノイズを除去する (風・車など)", value=True)
+cutoff_freq = form.slider("カットする周波数 (Hz)", min_value=100, max_value=2000, value=500, step=50)
+form.form_submit_button("設定を適用して解析")
 
 SAMPLE_DIR = "custom_samples"
 @st.cache_data
